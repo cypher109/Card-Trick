@@ -1,0 +1,190 @@
+<html>
+<head>
+<style type="text/css">
+body
+{
+	font-family:"Trebuchet MS", Helvetica, sans-serif
+}
+.column, .choice
+{
+	width:120;
+	float:left;
+	border:1px solid black;
+	margin-right:20px;
+	text-align:center;
+}
+.column img.overlap:not(:first-child)
+{
+	margin-top:-80px;
+}
+#info
+{
+	width:100%;
+}
+.playing_deck
+{
+	width:500px;
+	float:left;
+}
+#chosen_area
+{
+	margin-top:150px;
+	width:250px;
+	float:left;
+}
+#chosen_card
+{
+	text-align:center;
+}
+#chosen_card_info
+{
+	text-align:center;
+	font-size:2em;
+}
+</style>
+<script type="text/javascript">
+var cards = new Array(21);
+var column_1;
+var column_2;
+var column_3;
+var iteration = 0;
+function shuffle_cards()
+{
+	//this create and shuffles 21 cards
+	//randomly choose starting card between 1 and 52
+	var start_card = Math.floor((Math.random() * 52) + 1);
+	cards[0] = start_card;
+	//loop 21 times assigning cards and start over when number gets to 52
+	var current_card;
+	for(var i = 1;i<21;i++)
+	{
+		current_card = start_card + i;
+		if(current_card>52)
+		{
+			current_card -= 52;
+		}
+		cards[i] = current_card;
+	}
+}
+
+function layout_cards()
+{
+	column_1 = new Array();
+	column_2 = new Array();
+	column_3 = new Array();
+	//lays out cards into 3 different columns (using 3 different arrays here)
+	for(var i = 0;i<21;i++)
+	{
+		if((i+1)%3==0)
+		{
+			column_3.push(cards[i]);
+		}else if((i+1)%2==0)
+		{
+			column_2.push(cards[i]);
+		}else
+		{
+			column_1.push(cards[i]);
+		}
+	}
+	iteration++;
+}
+
+function display_cards()
+{
+	if(iteration<=3)
+	{
+		var string = "";
+		for(var i = 0;i<column_1.length;i++)
+		{
+			string += "<img src='images/cards/"+column_1[i]+".png' class='overlap playing_card'/>";
+		}
+		document.getElementById("column_1").innerHTML = string;
+		
+		string = "";
+		for(var i = 0;i<column_2.length;i++)
+		{
+			string += "<img src='images/cards/"+column_2[i]+".png' class='overlap playing_card'/>";
+		}
+		document.getElementById("column_2").innerHTML = string;
+		
+		string = "";
+		for(var i = 0;i<column_3.length;i++)
+		{
+			string += "<img src='images/cards/"+column_3[i]+".png' class='overlap playing_card'/>";
+		}
+		document.getElementById("column_3").innerHTML = string;
+		
+		document.getElementById("step").innerText = iteration;
+		if(iteration>1)
+		{
+			document.getElementById("instructions").innerText = "Keep remembering your chosen card. Select the column it is in.";
+		}
+	}else
+	{
+		//disable column buttons
+		document.getElementById('column1_btn').style.display = "none";
+		document.getElementById('column2_btn').style.display = "none";
+		document.getElementById('column3_btn').style.display = "none";
+		//alert(cards[10]);
+		//show chosen card here
+		var string = "<img src='images/cards/"+cards[10]+".png' class='chosen_card'/>";
+		document.getElementById("chosen_card").innerHTML = string;
+		document.getElementById("chosen_card_info").innerHTML = "<p>Is this your card?</p>";
+	}
+}
+
+function choose_column(choice)
+{
+	switch(choice)
+	{
+	case 'column_1':
+		reorganize_cards(column_2,column_1,column_3);
+		break;
+	case 'column_2':
+		reorganize_cards(column_1,column_2,column_3);
+		break;
+	case 'column_3':
+		reorganize_cards(column_2,column_3,column_1);
+		break;
+	}
+}
+
+function reorganize_cards(first,second,third)
+{
+	cards = first.concat(second.concat(third));
+	layout_cards();
+	display_cards();
+}
+
+window.onload = function(){
+	shuffle_cards();
+	layout_cards();
+	display_cards();
+}
+</script>
+</head>
+<body>
+<div id="info">
+	<p>
+		<span id="instructions">Pick a card and remember it. Then choose the column it is in.</span><br />
+		Step <span id="step"></span> of 3
+	</p>
+</div>
+<div style="clear:both"></div>
+<div class="playing_deck">
+	<div id="column_1" class="column"></div>
+	<div id="column_2" class="column"></div>
+	<div id="column_3" class="column"></div>
+	<div style="clear:both"></div>
+	<div class="choice"><input type="button" id="column1_btn" onclick="choose_column('column_1')" value="Col 1" /></div>
+	<div class="choice"><input type="button" id="column2_btn" onclick="choose_column('column_2')" value="Col 2" /></div>
+	<div class="choice"><input type="button" id="column3_btn" onclick="choose_column('column_3')" value="Col 3" /></div>
+	<div style="clear:both"></div>
+</div>
+<div id="chosen_area">
+<div id="chosen_card"></div>
+<div style="clear:both"></div>
+<div id="chosen_card_info"></div>
+</div>
+</body>
+</html>
